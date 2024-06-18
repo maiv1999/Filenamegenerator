@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interaktive Tabelle mit Phasen</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid black;
+            text-align: center;
+            padding: 8px;
+        }
+        .clickable {
+            cursor: pointer;
+        }
+        .hidden {
+            display: none;
+        }
+        .toggle {
+            cursor: pointer;
+            width: 20px;
+            text-align: center;
+        }
+        .total-row {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Interaktive Tabelle mit Phasen</h1>
+    <table id="dataTable">
+        <thead>
+            <tr>
+                <th></th>
+                <th>ID</th>
+                <th>Phase</th>
+                <th>Tut es</th>
+                <th>Tut es teilweise</th>
+                <th>Tut es nicht</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Phasen und IDs hinzufügen -->
+            <script>
+                for (let phase = 1; phase <= 10; phase++) {
+                    document.write('<tr>' +
+                                   '<td class="toggle" onclick="togglePhase(' + phase + ')">></td>' +
+                                   '<td></td>' +
+                                   '<td>Phase ' + phase + '</td>' +
+                                   '<td></td>' +
+                                   '<td></td>' +
+                                   '<td></td>' +
+                                   '</tr>');
+                    for (let id = 1; id <= 10; id++) {
+                        document.write('<tr class="phase-' + phase + ' hidden">' +
+                                       '<td></td>' +
+                                       '<td>' + id + '</td>' +
+                                       '<td>Phase ' + phase + '</td>' +
+                                       '<td class="clickable" onclick="markCell(this, 1)"></td>' +
+                                       '<td class="clickable" onclick="markCell(this, 0.5)"></td>' +
+                                       '<td class="clickable" onclick="markCell(this, 0)"></td>' +
+                                       '</tr>');
+                    }
+                }
+            </script>
+            <tr class="total-row">
+                <td colspan="6">Summe: <span id="totalSum">0</span></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script>
+        function markCell(cell, value) {
+            const row = cell.parentElement;
+            const cells = row.querySelectorAll('.clickable');
+            cells.forEach(c => c.textContent = ''); // Alle Zellen in der Zeile leeren
+            cell.textContent = 'x'; // 'x' in die angeklickte Zelle einfügen
+            row.dataset.value = value; // Speichere den Wert in der Zeile
+            calculateTotal(); // Berechne die Summe neu
+        }
+
+        function calculateTotal() {
+            const rows = document.querySelectorAll('#dataTable tbody tr:not(.total-row):not(.hidden)');
+            let total = 0;
+            rows.forEach(row => {
+                total += parseFloat(row.dataset.value || 0); // Addiere die gespeicherten Werte
+            });
+            document.getElementById('totalSum').textContent = total; // Zeige die Summe an
+        }
+
+        function togglePhase(phase) {
+            const rows = document.querySelectorAll('.phase-' + phase);
+            const toggle = document.querySelector('.toggle[onclick="togglePhase(' + phase + ')"]');
+            rows.forEach(row => {
+                row.classList.toggle('hidden');
+            });
+            toggle.textContent = toggle.textContent === '>' ? 'v' : '>';
+        }
+    </script>
+</body>
+</html>
+
+
